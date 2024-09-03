@@ -844,6 +844,149 @@ Use Case:
   dashboard/settings/profile
   dashboard/settings/password
   
-  
+  /dashboard/settings
+...................................................................................
+....................................................................................
+		What if page.js not created - Page Not Found
+....................................................................................
 
+what if i have folder src/app/contact, but no page.js 
 
+http://localhost:3000/contact
+
+You will get page but this page is error page - not-found.js
+
+if page.js not found,then it will throw "404 Page Not Found",that means next automatically fallback to "ErrorBoundary",It maps against default "not-found.js"
+
+What if i want to customize error message?
+
+we can override "not-found.js"
+
+not-found.js
+export default function NotFound() {
+    return <h1>
+        OOps,The Page You requested not Available
+    </h1>
+}
+....................................................................................
+			 Public Access Route
+...................................................................................
+if you have different name other than page.js, it will not be available for public access.
+
+app/settings/config.js
+
+http://localhost:3000/services/myservices - It will throw error..
+.....................................................................................
+....................................................................................
+			 Component Driven Archiecture
+....................................................................................
+
+Layout is container, Page is mapped against route segment, which displays UI.
+
+Can Page Hold other Components?
+
+Yes
+
+G:\IBM\2024\Sep\nextjs>npx create-next-app@latest
+√ What is your project named? ... next-components
+√ Would you like to use TypeScript? ... No / Yes
+√ Would you like to use ESLint? ... No / Yes
+√ Would you like to use Tailwind CSS? ... No / Yes
+√ Would you like to use `src/` directory? ... No / Yes
+√ Would you like to use App Router? (recommended) ... No / Yes
+√ Would you like to customize the default import alias (@/*)? ... No / Yes
+√ What import alias would you like configured? ... @/*
+
+	
+    				Co-location
+
+In addition to special files, you have the option to colocate your own files (e.g. components, styles, tests, etc) inside folders in the app or any route  directory.
+
+src/app/welcome/page.js
+
+import { Greeter } from "./Greeter";
+
+export default function WelcomePage(){
+    return <div>
+        <Greeter/>
+    </div>
+}
+src/app/welcome/Greeter.jsx
+//here you can write react components
+
+import { Hello } from "./Hello";
+
+export  function Greeter(){
+    return <section>
+        <Hello/>
+    </section>
+}
+
+src/app/welcome/Hello.jsx
+
+export  function Hello(){
+    return <h1>
+        Hello
+    </h1>
+}
+...................................................................................
+			How to pass Data To Components-Props
+
+src/app/profile/Profile.jsx
+
+src/app/profile/page.js
+import Profile from "./Profile";
+
+export default function ProfilePage() {
+    return <div>
+        <h1>Profile Details</h1>
+        <Profile user={{ id: 1, name: 'Subramanian' }} />
+        <Profile user={{ id: 2, name: 'Murugan' }} />
+        <Profile user={{ id: 3, name: 'Karthik' }} />
+        <Profile user={{ id: 4, name: 'Ram' }} />
+        <Profile user={{ id: 5, name: 'Simon' }} />
+
+    </div>
+}
+...................................................................................
+		 What if the props not passed: default props
+..................................................................................
+
+src/app/profile/Profile.jsx
+
+// export default function Profile(props){
+
+//     return <div>
+//         <h2>Id : {props.user.id}</h2>
+//         <h2>Name : {props.user.name}</h2>
+
+//     </div>
+// }
+
+// //old way of setting default values
+// Profile.defaultProps = {
+//     user: {
+//         id:0 ,
+//         name:'name'
+//     }
+// }
+
+export default function Profile({ user = { id: 0, name: 'name' } }) {
+    return <div>
+        {/* <h2>Id : {props.user.id}</h2>
+        <h2>Name : {props.user.name}</h2> */}
+        {/* <h2>Id : {user.id}</h2>
+        <h2>Name : {user.name}</h2> */}
+        <h2>Id : {user.id}</h2>
+        <h2>Name : {user.name}</h2>
+    </div>
+}
+
+Task:
+ Create Todo Page , pass list of todos as array
+   Component breakup:
+     -TodoList
+     -TodoListItem
+
+Sample Mock data:
+https://jsonplaceholder.typicode.com/todos
