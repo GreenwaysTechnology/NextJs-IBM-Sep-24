@@ -1127,6 +1127,7 @@ Directive is instruction to the compiler.
 src/app/reviews/components/likes.jsx
 
 'use client'
+
 import { useState } from "react"
 export const Like = props => {
     const [value, setValue] = useState(0)
@@ -1955,12 +1956,238 @@ export default function TodoDetailPage(props) {
 
 Note:
  here props.params.id, "id" is name of the folder eg [id]
+		...................................................................................
+			Master details Page Using API Calls
 ...................................................................................
 
+In Nextjs , api calls are made using "fetch" api by default.
+fetch is promise powered, when ever or where ever you call feth api, you can use async...await keyword.
+server component functions can be marked async keyword
 
 
+server component functions can be marked async keyword
+
+src/app/photos/page.js
+import Link from "next/link"
 
 
+//api
+export async function fetchPhotos() {
+    try {
+        const url = 'https://jsonplaceholder.typicode.com/photos'
+        const response = await fetch(url)
+        const photos = await response.json()
+        return photos
+    }
+    catch (err) {
+        console.log(err)
+    }
+
+}
+
+export default async function Photos() {
+    const photos = await fetchPhotos()
+
+    return <div>
+        <h1>Photos App</h1>
+        <ul>
+            {
+                photos.map(photo => {
+                    return <li key={photo.id}>
+                        <Link href={`/photos/${photo.id}`}>{photo.title}</Link>
+                    </li>
+                })
+            }
+        </ul>
+    </div>
+}
+
+src/app/photos/[id]/page.js
+import Image from "next/image"
+
+export async function fetchPhotosById(id) {
+    const url = `https://jsonplaceholder.typicode.com/photos/${id}`
+    const response = await fetch(url)
+    const photo = await response.json()
+    return photo
+}
 
 
+export default async function PhotoDetailsPage(props) {
+    const photo = await fetchPhotosById(Number(props.params.id))
+
+    return <div>
+        <h1>Photos Details Page</h1>
+        <h2>Photo Id :{photo.id} </h2>
+        <h3>AlbumId : {photo.albumId}</h3>
+        <p>{photo.title}</p>
+        <p>{photo.thumbnailUrl}</p>
+        <Image
+            src={photo.thumbnailUrl}
+            width={150}
+            height={150}
+            alt="Picture of the author"
+        />
+    </div>
+}
+
+In order to work with images, we need to configure image location in next.config.mjs
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+    images: {
+        remotePatterns: [{
+            protocol: 'https',
+            hostname: 'via.placeholder.com',
+            port: '',
+            pathname: '/150/**'
+        }]
+    }
+};
+
+export default nextConfig;
+.....................................................................................
+.....................................................................................
+			Styling- CSS,IMAGES,Fonts
+.....................................................................................
+
+Types of styling:
+
+1.Global CSS
+2.CSS Modules
+3.CSS Framworks
+  ->Tailwind framwork
+  ->bootstrap
+  ->SASS
+4.CSS in js
+
+G:\IBM\2024\June\NextJs>npx create-next-app@latest
+√ What is your project named? ... styling-app
+√ Would you like to use TypeScript? ... No / Yes
+√ Would you like to use ESLint? ... No / Yes
+√ Would you like to use Tailwind CSS? ... No / Yes
+√ Would you like to use `src/` directory? ... No / Yes
+√ Would you like to use App Router? (recommended) ... No / Yes
+√ Would you like to customize the default import alias (@/*)? ... No / Yes
+√ What import alias would you like configured? ... @/*
+Creating a new Next.js app in G:\IBM\2024\June\NextJs\styling-app.
+
+Using npm.
+
+Initializing project with template: app-tw
+
+
+Installing dependencies:
+- react
+- react-dom
+- next
+
+Installing devDependencies:
+- postcss
+- tailwindcss
+
+  
+Next Provides file called "global.css"
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 214, 219, 220;
+  --background-end-rgb: 255, 255, 255;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-start-rgb: 0, 0, 0;
+    --background-end-rgb: 0, 0, 0;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+How to use css inside page or layouts?
+
+import "./globals.css";
+
+.....................................................................................
+			 CSS Modules
+.....................................................................................
+Component specific css.
+
+src/app/dashboard/dashboard.module.css
+.dashboard {
+    padding: auto;
+    border: 10px;
+    text-align: center;
+    height: 500px;
+    border-color: blue;
+    background-color: aquamarine;
+}
+
+src/app/dashboard/layout.js
+import styles from '@/app/dashboard/dashboard.module.css'
+
+export default function DashboardLayout({ children }) {
+    return <div className={styles.dashboard}>
+        {children}
+    </div>
+}
+src/app/dashboard/page.js
+
+export default function DashboardPage(){
+    return <h1>DashboardPage</h1>
+}
+.....................................................................................
+				Fonts
+.
+
+By default Next js supports google fonts.
+
+import { Inter } from "next/font/google";
+import "./globals.css";
+
+//inter font configuration
+const inter = Inter({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "Create Next App",
+  description: "Generated by create next app",
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
+    </html>
+  );
+}
+
+Task:
+ You have to build master details page
+
+ Master page must have card layout.
+
+ Detail page must have full information with layouts.
+
+Data Url:
+https://fakestoreapi.com/products
 

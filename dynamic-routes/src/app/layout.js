@@ -16,6 +16,7 @@ export default function RootLayout({ children }) {
         <nav>
           <ul>
             <li><Link href="/todos">Todos</Link></li>
+            <li><Link href="/photos">Photos</Link></li>
           </ul>
         </nav>
         <hr/>
