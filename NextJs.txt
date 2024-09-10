@@ -4230,9 +4230,184 @@ This folder having all production files
 How to test?
  npm start
 
+.....................................................................................
+			Dynamic segments and SSG
+....................................................................................
+
+Single Dynamic segment
+
+
+export async function generateStaticParams() {
+   return [
+      {id:'1'},{id:'2'},{id:'3'},{id:'4'},{id:'5'}
+   ]
+}
+export default function Page({params}) {
+  const {id} = params
+}
+URL Pattern:
+
+/product/1
+/product/2
+
+Multiple Dynamic segement:
+..........................
+
+export async function generateStaticParams() { 
+   
+ return [{id:'1',cagetory:'a'},{id:'2',cagetory:'b'},{id:'3',cagetory:'c'}]
+}
+
+eg:
+src/app/products/[category]/[product]/page.js
 
 
 
 
+export async function generateStaticParams() {
 
+    return [
+        {
+            category:'a',
+            product:'1'
+        },
+        {
+            category:'b',
+            product:'2'
+        },
+        {
+            category:'c',
+            product:'3'
+        },
+        {
+            category:'d',
+            product:'4'
+        }
+
+    ]
+}
+export default function Page({params}){
+    const {category,product} = params
+    return <>
+    <h1>Category {category} Product {product}</h1>
+    </>
+}
+.....................................................................................
+			Cath-All Dynamic Segment
+....................................................................................
+app/products/[...slug]/page.js
+
+export async function generateStaticParams() {
+   return [
+    {slug: ['a','1']}
+    {slug: ['b','2']}
+  ]
+}
+
+export default function Page({params}){
+     const {slug} = params
+    return <>
+    <h1> {slug}
+    </h1>
+}
+
+.....................................................................................
+			  Loading UI and Streaming 
+                              (React Suspense)
+....................................................................................
+
+Loading UI:
+..........
+  There is special file called "loading.js" helps to creating meaninggull loading Ui with "React Suspense"
+
+The special file loading.js helps you create meaningful Loading UI with React Suspense. With this convention, you can show an instant loading state from the server while the content of a route segment loads. The new content is automatically swapped in once rendering is complete.
+
+G:\IBM\2024\Sep\nextjs>npx create-next-app@latest
+√ What is your project named? ... loading-app
+√ Would you like to use TypeScript? ... No / Yes
+√ Would you like to use ESLint? ... No / Yes
+√ Would you like to use Tailwind CSS? ... No / Yes
+√ Would you like to use `src/` directory? ... No / Yes
+√ Would you like to use App Router? (recommended) ... No / Yes
+√ Would you like to customize the default import alias (@/*)? ... No / Yes
+√ What import alias would you like configured? ... @/*
+
+
+
+src/app/dashboard/layout.js
+
+export default function DashboardLayout(props){
+    return <>
+        {props.children}
+    </>
+}
+
+src/app/components/greeter.jsx
+export default function Greeter(){
+    return <h1>
+        Greeter
+    </h1>
+}
+src/app/dashboard/page.js
+import React from "react"
+
+//simulate delay using timers with promise
+const Welcome = React.lazy(() => {
+  return new Promise((resolve, reject) => {
+    setTimeout(resolve, 8000, import('./components/greeter'))
+  })
+})
+
+export default function Home() {
+  return <>
+    <Welcome />
+  </>
+}
+
+Component Structure:
+
+ <Layout>
+     <Suspense fallback={<Loading/>}>
+	  <Page/>
+     </Suspense>
+ </Layout>
+....................................................................................
+	Part of the page only dynamic, how to load static and dynamic content
+
+Can we add loadder via Suspense Manually?
+
+Yes, we can add , always local suspense takes priority.
+
+
+src/app/dashboard/page.js
+
+import React, { Suspense } from "react"
+
+//simulate delay using timers with promise
+const Welcome = React.lazy(() => {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, 8000, import('../components/greeter'))
+    })
+})
+
+const Greeter = React.lazy(() => {
+    return new Promise((resolve, reject) => {
+        setTimeout(resolve, 10000, import('../components/greeter'))
+    })
+})
+
+export default function DashboardPage() {
+    return <>
+        <h1>Dashboard Header</h1>
+        <Suspense fallback={<h1>Welcome is loading...</h1>}>
+            <Welcome />
+        </Suspense>
+        <Suspense fallback={<h1>Greeter is loading...</h1>}>
+            <Greeter />
+        </Suspense>
+        <h2>Dashboard Footer</h2>
+
+    </>
+
+}
 
