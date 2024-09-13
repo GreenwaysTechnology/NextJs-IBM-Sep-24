@@ -5282,7 +5282,7 @@ subscription  getStockQuote (params){
   qty
 }
 ....................................................................................
-				  How to learn graphql query language
+		   How to learn graphql query language
 
 in order to work with query language we need graphql server, if you dont have local graphql server we can use mock apis
 
@@ -5585,7 +5585,6 @@ What can be parameter or arg types?
  Input is special complex type, used to represent input parameters.
  Input types are very usefull incase of mutation
 
-I want to get Language information.
 I want to get Language information.
 
 query getlanguageInfo($filter:LanguageFilterInput) {
@@ -5891,3 +5890,1133 @@ Response:
         }
     }
 }
+...............................................................................
+
+....................................................................................
+				Mutations
+...................................................................................
+
+How to send payload to create,update,delete
+IN REST
+
+POST=>CREATE
+PUT=>UPDATE
+DELETE=>REMOVE
+GET=>READ
+
+Mutations 
+........
+
+mutation is keyword used to create,update,remove...
+API url :
+https://graphqlzero.almansi.me/api
+
+CREATE:
+.......
+eg:
+mutation CreatePost(
+  $input: CreatePostInput!
+) {
+  createPost(input: $input) {
+    id
+    title
+    body
+  }
+}
+
+Query Variables:
+{
+  "input": {
+    "title": "A Very Captivating Post Title",
+    "body": "Some interesting content."
+  }
+}
+
+Response:
+
+{
+    "data": {
+        "createPost": {
+            "id": "101",
+            "title": "A Very Captivating Post Title",
+            "body": "Some interesting content."
+        }
+    }
+}
+........................
+
+Update :
+mutation UpdatePost($id: ID!,$input: UpdatePostInput!) {
+  updatePost(id: $id, input: $input) {
+    id
+    body
+  }
+}
+Query Variable
+
+{
+  "id": 1,
+  "input": {
+    "body": "Some updated content."
+  }
+}
+
+Response
+{
+  "updatePost": {
+    "id": "1",
+    "body": "Some updated content."
+  }
+}
+....................................................................................
+Delete :
+
+mutation RemovePost($id: ID!) {
+  deletePost(id: $id)
+}
+Query Variable:
+
+{
+  "id": 101
+}
+Response:
+{
+  "deletePost": true
+}
+.....................................................................................
+...................................................................................	
+		            	How to write schema
+....................................................................................
+
+The schema file is saved as "fileName.schema".
+
+Schema is collection of Object types that contain fields.Each field has a type of its own.
+A field type can be scalar(primitives Such as Int,String) or it can another object type.eg User can have Address type.
+
+We need to use with key word called "type"
+
+type | input | enum TypeName {
+  field:Datatype
+}
+....................................................................................
+SDL Defines its language and platform independant data types
+
+1.scallar types
+2.Custom types/Reference Types/Object types.
+
+1.Scallar types
+ Scallares are primitive types in your language.
+
+1.Int -32 bit signed integer
+2.String-UTF-8 char sequence
+3.Boolean - true or false
+4.Float - signed Double
+5.ID(Serialized String) - A unique identifier.
+
+2.Custom types
+ Similar to classes in Object oriented languages like c++ ,java,C#,Typescript
+
+type User{
+  id:ID
+  firstName:String
+  lastName:String
+  age:Int
+  points:Float
+  status:Boolean
+}
+
+Object can have other objects : Nested Object
+  HAS-A relationship or Depedency Injection
+
+
+type Address {
+  city:String
+  state:String
+  zipCode:String
+}
+
+type User{
+  id:ID
+  firstName:String
+  lastName:String
+  age:Int
+  points:Float
+  status:Boolean
+  address:Address
+}
+.................................................................................
+			Collection - List of similar Values
+..................................................................................
+
+A field may have one or more values
+
+fieldName:[DataType]
+ Here Datatype can be scalar type or Object type
+
+fieldName:[String] | [Int] | [Float]
+fieldName:[Address] [Order] [Items]
+
+Collection can also be not null
+
+fieldName:[String]! | [Int]! | [Float]!
+fieldName:[Address]! [Order]! [Items]!
+
+			Query Type
+.....................................................................................
+
+Query is collection of apis
+Query api can accept input and return values
+
+No parameter: only Return
+..........................
+field:Type
+
+eg:
+
+type Query {
+  name:String
+  user:User
+  users:[User]
+}
+Client side:Query language 
+query {
+  name
+}
+{
+  user {
+   id
+   name
+  }
+}
+{
+  users {
+     user { 
+	id 
+	name
+     }
+  }
+}
+Parameters, And Return value:
+.............................
+field:Type
+
+type Query {
+   name(name:String,message:String):String
+   userById(id:ID!):User
+   usersByCity(city:String):[User]!
+}
+.....................................................................................
+			 Advanced Types
+.....................................................................................
+
+=>Mutation
+=>Subscription
+=>Input
+=>Enum
+=>Union
+=>Interface
+
+Mutation:
+ Write and Read operations where as Query type is read only.
+
+Signature of the Mutation:
+
+type Mutation{
+  createUser(id:ID,name:String,lastName:String,age:Int):User
+  updateUser(id:ID,user:User):User
+  removeUser(id:ID):User
+}
+
+in the above example, more no parameters we need to pass, which makes your code more difficult to understand and read thats where we have new type called "INPUT" type.
+...................................................................................
+			  Input Types
+.................................................................................
+
+Input types are special object types that allow you to provide hierachical data as arguments to fields(as apposed to providing only flat scalar args).
+type Mutation{
+ #Flat scalar args
+  createUser(id:ID,name:String,lastName:String,age:Int):User
+}
+
+type Address {
+  city:String!
+  state:String
+  zipCode:String
+}
+
+type User{
+  id:ID!
+  firstName:String!
+  lastName:String!
+  age:Int
+  points:Float
+  status:Boolean
+  address:Address
+}
+
+input CreateUserInput{
+  id:ID!
+  name:String
+  lastName:String
+  age:Int
+}
+
+type Mutation{
+  createUser(userInput:CreateUserInput!):User
+}
+...................................................................................
+			   Enums
+....................................................................................
+An Enum is similar to scalar types, but its legal values are defined in the schema
+
+enum Gender {
+  MALE
+  FEMALE
+  THIRD
+}
+How to use Enum
+
+
+type User{
+  id:ID!
+  firstName:String!
+  lastName:String!
+  gender:Gender
+  age:Int
+  points:Float
+  status:Boolean
+  address:Address
+}
+.....................................................................................
+			  Union and Interfaces
+....................................................................................
+Union:
+  Unions and interfaces abstract graphql types that enables a schema field to return one of multiple object types.
+
+union Media = Image | Video
+
+type Query {
+  getMedia:Media
+}
+
+Union type must not be scallar type values it must be always object
+
+ union Foo: String | Int => which is wrong
+.....................................................................................
+                        Interfaces
+.....................................................................................
+
+interface represents common fields that multiple objects can include.
+
+interface Book{ 
+  title:String!
+  author:String!
+}
+
+type TechnicalBook implments Book { 
+  title:String!
+  author:String!
+  X:String
+}
+
+
+type StoryBook implments Book { 
+  title:String!
+  author:String!
+  Y:String
+}
+....................................................................................
+			  Custom Scallar
+
+Graphql SDL provides basic core types - Int,String,Boolean,ID,Float
+What if i want other types like Date,Time
+
+How to define custom scalar?
+
+scalar Date
+
+type User{
+  id:ID!
+  firstName:String!
+  lastName:String!
+  gender:Gender
+  dob:Date
+  age:Int
+  points:Float
+  status:Boolean
+  address:Address
+}
+Date if you declare , you wont get date value, rather we need to write logic how date is represented in server side.
+....................................................................................
+			 Custom Directives
+....................................................................................
+directive @cacheControl(
+  maxAge: Int
+  scope: CacheControlScope
+) on FIELD_DEFINITION | OBJECT | INTERFACE
+
+Here we create @cacheControl directives, we need to write logic in the server side code..
+.....................................................................................
+Implementation
+
+Client : Next.js
+Server : Using Graphql server implmentation, could be any language java,js
+
+....................................................................................
+			....................................................................................
+			Implementation
+....................................................................................
+Requirement:
+ 1.You must have SDL before starting any code
+
+Graphql application can be written in any language..
+
+Javascript implmentation (runtime is Node.js)
+
+1.graphql.js
+  =>Core framework written by facebook 
+  =>You can run standalone or on top of  web servers
+  =>Express.js is underlying framework
+2.Apollo
+   =>It is platform for building graphql apps called "SuperGraphs"
+   =>It is written on the top of express server with microservice developments.
+
+Components of Apollo(Graphql apps):
+
+1.Apollo Server
+2.Schema definitions - SDL
+3.Resolvers - Schema Implmenetation - where we write biz logic
+4.Datasources- Database or another rest api...
+.....................................................................................
+
+
+Project Setup:
+..............
+
+G:\IBM\2024\Sep\nextjs>mkdir graphql-app
+G:\IBM\2024\Sep\nextjs>cd graphql-app
+
+G:\IBM\2024\Sep\nextjs\graphql-app>
+G:\IBM\2024\Sep\nextjs\graphql-app>npm init --yes
+Wrote to G:\IBM\2024\Sep\nextjs\graphql-app\package.json:
+
+{
+  "name": "graphql-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
+G:\IBM\2024\Sep\nextjs\graphql-app>npm i @apollo/server graphql
+
+Type script:
+npm i --save-dev typescript @types/node
+npm install --save-dev tsc-watch
+
+scripts
+package.json
+{
+  "name": "graphql-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js",
+    "watch": "tsc-watch --onSuccess \"node ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "graphql": "^16.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "tsc-watch": "^6.2.0",
+    "typescript": "^5.4.5"
+  }
+}
+
+Type script:
+npm i --save-dev typescript @types/node
+npm install --save-dev tsc-watch
+
+tsconfig.json
+{
+    "compilerOptions": {
+        "rootDir": ["src"],
+        "outDir": "dist",
+        "lib": ["ES2020"],
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "types": ["node"]
+    },
+    "exclude": [
+        "node_modules"
+    ]
+}
+	
+package.json
+{
+  "name": "graphql-app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc",
+    "start": "npm run compile && node ./dist/index.js",
+    "watch": "tsc-watch --onSuccess \"node ./dist/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@apollo/server": "^4.10.4",
+    "graphql": "^16.8.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "tsc-watch": "^6.2.0",
+    "typescript": "^5.4.5"
+  }
+}
+
+src/index.js
+import { ApolloServer } from "@apollo/server"
+import {startStandaloneServer} from '@apollo/server/standalone'
+//schema definition
+const typeDefs = `
+ type Query {
+    hello:String
+ }
+`
+//resolver : write api implementation
+const resolvers = {
+    //curd operations
+    Query: {
+        hello() {
+            return "Hello Graphql"
+        }
+    }
+}
+//create apolloServer
+const server = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers
+})
+//Web container to deploy graphql server
+const { url } = await startStandaloneServer(server, {
+    listen: {
+        port: 4000
+    }
+})
+console.log('Apollo Server is Ready!')
+
+G:\IBM\2024\June\NextJs\graphql-app>npm start
+
+> graphql-app@1.0.0 start
+> npm run compile && node ./dist/index.js
+
+
+> graphql-app@1.0.0 compile
+> tsc
+
+Apollo Server is Ready!
+
+Now you can lanuch apollo playground, and test how the api works
+.....................................................................................
+		      How to Return object
+.....................................................................................
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from '@apollo/server/standalone'
+
+//schema definition 
+
+const typeDefs = `
+
+ type User {
+    id:ID
+    name:String
+    age:Int
+    points:Float
+    status:Boolean
+ }
+
+ type Query {
+    user:User
+ }
+`
+
+//biz logic : hello query implementation
+
+const resolvers = {
+    //Query
+    Query: {
+        //api implementation
+        user() {
+            return {
+                id: 1,
+                name: 'Subramanian',
+                age: 43,
+                status: true,
+                points: 10.5
+            }
+        }
+    }
+}
+//Create ApolloServer and deploy schema and resolvers
+const server = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers
+})
+
+//start web container on which Apollo server going to Run
+
+const { url } = await startStandaloneServer(server, {
+    listen: {
+        port: 4000
+    }
+})
+console.log('Apollo Server is Ready!', url)
+
+
+Client:
+
+query USERINFO {
+  user {
+    id
+    name
+    age
+    status
+  }
+}
+
+Response:
+{
+  "data": {
+    "user": {
+      "id": "1",
+      "name": "Subramanian",
+      "age": 43,
+      "status": true
+    }
+  }
+}
+.....................................................................................				 Nested Object
+.....................................................................................
+
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from '@apollo/server/standalone'
+
+//schema definition 
+const typeDefs = `
+
+ type User {
+    id:ID
+    name:String
+    age:Int
+    points:Float
+    status:Boolean
+    address:Address
+ }
+
+ type Address {
+    city:String
+    state:String
+ }
+
+ type Query {
+    user:User
+ }
+`
+
+//biz logic : hello query implementation
+
+const resolvers = {
+    //Query
+    Query: {
+        //api implementation
+        user() {
+            return {
+                id: 1,
+                name: 'Subramanian',
+                age: 43,
+                address: {
+                    city:'Coimbatore',
+                    state:'TN'
+                },
+                status: true,
+                points: 10.5
+            }
+        }
+    }
+}
+//Create ApolloServer and deploy schema and resolvers
+const server = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers
+})
+
+//start web container on which Apollo server going to Run
+const { url } = await startStandaloneServer(server, {
+    listen: {
+        port: 4000
+    }
+})
+console.log('Apollo Server is Ready!', url)
+
+
+
+
+query USERINFO {
+  user {
+    id
+    name
+    age
+    status
+    address {
+      city
+    }
+  }
+}
+
+{
+  "data": {
+    "user": {
+      "id": "1",
+      "name": "Subramanian",
+      "age": 43,
+      "status": true,
+      "address": {
+        "city": "Coimbatore"
+      }
+    }
+  }
+}
+....................................................................................
+			  Not Null 
+.....................................................................................
+
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from '@apollo/server/standalone'
+
+//schema definition 
+const typeDefs = `
+
+ type User {
+    id:ID!
+    name:String!
+    age:Int
+    points:Float
+    status:Boolean
+    address:Address
+ }
+
+ type Address {
+    city:String
+    state:String
+ }
+
+ type Query {
+    user:User
+ }
+`
+
+//biz logic : hello query implementation
+
+const resolvers = {
+    //Query
+    Query: {
+        //api implementation
+        user() {
+            return {
+                id: null,
+                name: null,
+                age: 43,
+                address: {
+                    city:'Coimbatore',
+                    state:'TN'
+                },
+                status: true,
+                points: 10.5
+            }
+        }
+    }
+}
+//Create ApolloServer and deploy schema and resolvers
+const server = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers
+})
+
+//start web container on which Apollo server going to Run
+const { url } = await startStandaloneServer(server, {
+    listen: {
+        port: 4000
+    }
+})
+console.log('Apollo Server is Ready!', url)
+
+query USERINFO {
+  user {
+    id
+    name
+    age
+    status
+    address {
+      city
+    }
+  }
+}
+
+Response:
+{
+  "errors": [
+    {
+      "message": "Cannot return null for non-nullable field User.id.",
+      "locations": [
+        {
+          "line": 3,
+          "column": 5
+        }
+      ],
+      "path": [
+        "user",
+        "id"
+      ],
+      "extensions": {
+        "code": "INTERNAL_SERVER_ERROR",
+        "stacktrace": [
+          "Error: Cannot return null for non-nullable field User.id.",
+          "    at completeValue (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:605:13)",
+          "    at executeField (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:500:19)",
+          "    at executeFields (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:414:22)",
+          "    at completeObjectValue (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:925:10)",
+          "    at completeValue (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:646:12)",
+          "    at executeField (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:500:19)",
+          "    at executeFields (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:414:22)",
+          "    at executeOperation (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:344:14)",
+          "    at execute (G:\\IBM\\2024\\Sep\\nextjs\\graphql-app\\node_modules\\graphql\\execution\\execute.js:136:20)",
+          "    at executeIncrementally (file:///G:/IBM/2024/Sep/nextjs/graphql-app/node_modules/@apollo/server/dist/esm/incrementalDeliveryPolyfill.js:21:12)"
+        ]
+      }
+    }
+  ],
+  "data": {
+    "user": null
+  }
+}
+....................................................................................
+				Collections
+......................................................................................import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from '@apollo/server/standalone'
+
+//schema definition 
+const typeDefs = `
+ type User {
+    id:ID!
+    name:String!
+    age:Int
+    points:Float
+    status:Boolean
+    address:Address
+ }
+
+ type Address {
+    city:String
+    state:String
+ }
+
+ type Query {
+    users:[User]
+ }
+`
+
+//biz logic : hello query implementation
+
+const resolvers = {
+    //Query
+    Query: {
+        //api implementation
+        users() {
+            return [{
+                id: 1,
+                name: 'Subramanian',
+                age: 43,
+                address: {
+                    city: 'Coimbatore',
+                    state: 'TN'
+                },
+                status: true,
+                points: 10.5
+            },
+            {
+                id: 2,
+                name: 'Murugan',
+                age: 56,
+                address: {
+                    city: 'Coimbatore',
+                    state: 'TN'
+                },
+                status: true,
+                points: 10.5
+            }
+        
+        ]
+        }
+    }
+}
+//Create ApolloServer and deploy schema and resolvers
+const server = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers
+})
+
+//start web container on which Apollo server going to Run
+const { url } = await startStandaloneServer(server, {
+    listen: {
+        port: 4000
+    }
+})
+console.log('Apollo Server is Ready!', url)
+
+query USERSINFO {
+  users {
+    id
+    name
+    age
+    status
+    address {
+      city
+    }
+  }
+}
+
+Response:
+{
+  "data": {
+    "users": [
+      {
+        "id": "1",
+        "name": "Subramanian",
+        "age": 43,
+        "status": true,
+        "address": {
+          "city": "Coimbatore"
+        }
+      },
+      {
+        "id": "2",
+        "name": "Murugan",
+        "age": 56,
+        "status": true,
+        "address": {
+          "city": "Coimbatore"
+        }
+      }
+    ]
+  }
+}
+.....................................................................................
+			Mutation  - Insert And Input Type
+.....................................................................................
+
+import { ApolloServer } from "@apollo/server";
+import { startStandaloneServer } from '@apollo/server/standalone'
+
+//schema definition 
+const typeDefs = `
+ type User {
+    id:ID!
+    name:String!
+    age:Int
+    points:Float
+    status:Boolean
+    address:Address
+ }
+
+ type Address {
+    city:String
+    state:String
+ }
+
+ input CreateUserInput {
+  id:ID
+  name:String
+  age:Int
+  status:Boolean
+  points:Float
+ }
+
+ type Query {
+    users:[User],
+ }
+ type Mutation {
+    saveUser(user:CreateUserInput):User
+ }
+`
+
+//biz logic : hello query implementation
+
+const resolvers = {
+    //Query
+    Query: {
+        //api implementation
+        users() {
+            return [{
+                id: 1,
+                name: 'Subramanian',
+                age: 43,
+                address: {
+                    city: 'Coimbatore',
+                    state: 'TN'
+                },
+                status: true,
+                points: 10.5
+            },
+            {
+                id: 2,
+                name: 'Murugan',
+                age: 56,
+                address: {
+                    city: 'Coimbatore',
+                    state: 'TN'
+                },
+                status: true,
+                points: 10.5
+            }
+
+            ]
+        }
+    },
+    Mutation: {
+        saveUser(parent, args, ctx, info) {
+            console.log(args)
+            const { user } = args 
+            return user
+        }
+    }
+}
+//Create ApolloServer and deploy schema and resolvers
+const server = new ApolloServer({
+    typeDefs: typeDefs,
+    resolvers: resolvers
+})
+
+//start web container on which Apollo server going to Run
+const { url } = await startStandaloneServer(server, {
+    listen: {
+        port: 4000
+    }
+})
+console.log('Apollo Server is Ready!', url)
+.....................................................................................
+			Graphql With Nextjs
+.....................................................................................
+
+√ What is your project named? ... graphql-nextclient
+√ Would you like to use TypeScript? ... No / Yes
+√ Would you like to use ESLint? ... No / Yes
+√ Would you like to use Tailwind CSS? ... No / Yes
+√ Would you like to use `src/` directory? ... No / Yes
+√ Would you like to use App Router? (recommended) ... No / Yes
+√ Would you like to customize the default import alias (@/*)? ... No / Yes
+√ What import alias would you like configured? ... @/*
+Creating a new Next.js app in G:\IBM\2024\Sep\nextjs\graphql-nextclient.
+Apollo has released "Apollo client Lib with Next.js 13 onwards".
+
+Lib:
+ This lib now is under experimental, in future it will be stablished..
+
+@apollo/experimental-nextjs-app-support.
+
+Next 13 Compoent types
+
+1.Server Component
+2.Client Component
+
+Apollo provides wrapper for both components...
+
+
+Eg:
+npm install @apollo/client@latest @apollo/experimental-nextjs-app-support
+
+
+src/app/lib/client.js
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+
+import {
+    registerApolloClient,
+} from "@apollo/experimental-nextjs-app-support";
+
+export const { getClient } = registerApolloClient(() => {
+    return new ApolloClient({
+        cache: new InMemoryCache(),
+        link: new HttpLink({
+            // https://studio.apollographql.com/public/spacex-l4uc6p/
+            uri: "http://localhost:4000/",
+            // you can disable result caching here if you want to
+            // (this does not work if you are rendering your page with `export const dynamic = "force-static"`)
+            // fetchOptions: { cache: "no-store" },
+        }),
+    });
+});
+
+src/app/users/page.js
+
+import { gql } from "@apollo/client"
+import { getClient } from "../lib/client"
+
+//Declare Query
+const query = gql`query {
+    users {
+      id
+      name
+      status
+      points
+      
+    }
+  }
+`
+
+export default async function UsersPage() {
+    const { data: { users } } = await getClient().query({ query })
+
+    return <div>
+        <h1>Users Info From Graphql Server</h1>
+        <ul>
+            {users.map(user => {
+                return <li>
+                    <h3>{user.name} {user.status ? 'Available' : 'Not Available'}</h3>
+                </li>
+            })}
+        </ul>
+    </div>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
